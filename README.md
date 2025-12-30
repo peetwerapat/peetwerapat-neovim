@@ -26,6 +26,16 @@ git clone https://github.com/peetwerapat/neovim ~/.config/nvim
 nvim
 ```
 
+### Install tree-sitter-cli
+#### For macOs
+```bash
+brew install tree-sitter-cli
+```
+#### For Arch linux
+```bash
+sudo pacman -S tree-sitter-cli
+```
+
 ### Install treesiter parser
 ```bash
 :TSInstall lua vim vimdoc query javascript typescript tsx html css json yaml go markdown markdown_inline
