@@ -1,0 +1,162 @@
+return {
+  "nvim-tree/nvim-tree.lua",
+  dependencies = {
+    "nvim-tree/nvim-web-devicons",
+  },
+  config = function()
+    local nvimtree = require("nvim-tree")
+
+    nvimtree.setup({
+      auto_reload_on_write = true,
+      disable_netrw = false,
+      hijack_netrw = true,
+      hijack_cursor = false,
+      hijack_unnamed_buffer_when_opening = false,
+      open_on_tab = false,
+      sort_by = "name",
+      update_cwd = false,
+      view = {
+        width = 30,
+        side = "left",
+        preserve_window_proportions = false,
+        number = false,
+        relativenumber = false,
+        signcolumn = "yes",
+      },
+      renderer = {
+        indent_markers = {
+          enable = false,
+          icons = {
+            corner = "└ ",
+            edge = "│ ",
+            none = "  ",
+          },
+        },
+        icons = {
+          webdev_colors = true,
+        },
+      },
+      hijack_directories = {
+        enable = true,
+        auto_open = true,
+      },
+      update_focused_file = {
+        enable = false,
+        update_cwd = false,
+        ignore_list = {},
+      },
+      system_open = {
+        cmd = "",
+        args = {},
+      },
+      diagnostics = {
+        enable = false,
+        show_on_dirs = false,
+        icons = {
+          hint = "",
+          info = "",
+          warning = "",
+          error = "",
+        },
+      },
+      filters = {
+        dotfiles = false,
+        custom = {},
+        exclude = {},
+      },
+      git = {
+        enable = true,
+        ignore = false,
+        timeout = 10000,
+      },
+      actions = {
+        use_system_clipboard = true,
+        change_dir = {
+          enable = true,
+          global = false,
+          restrict_above_cwd = false,
+        },
+        open_file = {
+          quit_on_open = false,
+          resize_window = false,
+          window_picker = {
+            enable = true,
+            chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+            exclude = {
+              filetype = { "notify", "qf", "diff", "fugitive", "fugitiveblame" },
+              buftype = { "nofile", "terminal", "help" },
+            },
+          },
+        },
+      },
+      trash = {
+        cmd = "trash",
+        require_confirm = true,
+      },
+      log = {
+        enable = false,
+        truncate = false,
+        types = {
+          all = false,
+          config = false,
+          copy_paste = false,
+          diagnostics = false,
+          git = false,
+          profile = false,
+        },
+      },
+    })
+    vim.keymap.set("n", "<space>s", ":NvimTreeToggle<CR>", { silent = true })
+
+
+    -- -- important! it's from nvim-tree documentation and we need it
+    -- vim.g.loaded_netrw = 1
+    -- vim.g.loaded_netrwPlugin = 1
+
+    -- -- color for arrows in tree to lightblue
+    -- vim.cmd([[ highlight NvimTreeIndentMarker guifg=#3FC5FF ]])
+
+    -- -- config nvim-tree here
+    -- nvimtree.setup({
+    --   view = {
+    --     width = 40,
+    --     signcolumn = "yes",
+    --   },
+    --   renderer = {
+    --     icons = {
+    --       glyphs = {
+    --         folder = {
+    --           arrow_closed = "→",
+    --           arrow_open = "↓",
+    --         },
+    --       },
+    --     },
+    --   },
+    --   -- disable window picker
+    --   -- explorer to work well with
+    --   -- window splits
+    --   actions = {
+    --     open_file = {
+    --       window_picker = {
+    --         enable = false,
+    --       },
+    --     },
+    --   },
+    --   filters = {
+    --     custom = { ".DS_Store" },
+    --   },
+    --   git = {
+    --     ignore = false,
+    --   },
+    -- })
+
+    -- -- set keymaps
+    -- local keymap = vim.keymap
+
+    -- keymap.set("n", "<space>s", ":NvimTreeToggle<CR>", { silent = true })
+    -- -- keymap.set("n", "<leader>ee", "<cmd>NvimTreeToggle<CR>")
+    -- keymap.set("n", "<leader>ef", "<cmd>NvimTreeFindFileToggle<CR>")
+    -- keymap.set("n", "<leader>ec", "<cmd>NvimTreeCollapse<CR>")
+    -- keymap.set("n", "<leader>er", "<cmd>NvimTreeRefresh<CR>")
+  end,
+}
