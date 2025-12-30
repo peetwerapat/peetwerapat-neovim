@@ -1,11 +1,12 @@
 return {
   "ibhagwan/fzf-lua",
-  cmd = "FzfLua",
   dependencies = {
     "nvim-tree/nvim-web-devicons",
   },
-
+  keys = {
+    { "<leader>ff", "<cmd>FzfLua files<CR>", desc = "Find files" },
+  },
   config = function()
-    vim.keymap.set("n", "<leader>ff", "<cmd>FzfLua files<CR>")
+    require("fzf-lua").setup({})
   end,
 }

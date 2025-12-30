@@ -23,6 +23,15 @@ return {
       ctermbg = 41,
     })
 
+    vim.api.nvim_create_autocmd("TextYankPost", {
+      callback = function()
+        vim.highlight.on_yank({
+          higroup = "YankColor",
+          timeout = 200,
+        })
+      end,
+    })
+
     vim.api.nvim_set_hl(0, "DashboardHeader", { fg = "#1e90ff", bold = true })
     vim.api.nvim_set_hl(0, "DashboardFooter", { fg = "#ffcba4", italic = true })
 

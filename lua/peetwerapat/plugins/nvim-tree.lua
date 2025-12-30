@@ -6,6 +6,11 @@ return {
   config = function()
     local nvimtree = require("nvim-tree")
 
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+
+    vim.cmd([[ highlight NvimTreeIndentMarker guifg=#3FC5FF ]])
+
     nvimtree.setup({
       auto_reload_on_write = true,
       disable_netrw = false,
@@ -34,6 +39,12 @@ return {
         },
         icons = {
           webdev_colors = true,
+          glyphs = {
+            folder = {
+              arrow_closed = "→",
+              arrow_open = "↓",
+            },
+          },
         },
       },
       hijack_directories = {
