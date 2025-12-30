@@ -16,5 +16,17 @@
 
 ---
 
+### Clone to local config
 ```bash
-git clone https://github.com/peetwerapat/peetwerapat-neovim ~/.config/nvim
+git clone https://github.com/peetwerapat/neovim ~/.config/nvim
+```
+
+### Open neovim
+```bash
+nvim
+```
+
+### Install treesiter parser
+```bash
+:TSInstall lua vim vimdoc query javascript typescript tsx html css json yaml go markdown markdown_inline
+```
