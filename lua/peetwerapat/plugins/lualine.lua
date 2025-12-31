@@ -53,17 +53,33 @@ return {
         },
         lualine_b = {
           { "branch", icon = "" },
-          "diff",
+          -- "diff",
         },
         lualine_c = {
+          -- {
+          --   "filename",
+          --   path = 1,
+          --   symbols = {
+          --     modified = "[+]",
+          --     readonly = "[🔒]",
+          --     unnamed = "[No Name]",
+          --   },
+          -- },
           {
-            "filename",
-            path = 1,
-            symbols = {
-              modified = "[+]",
-              readonly = "[🔒]",
-              unnamed = "[No Name]",
-            },
+            function()
+              local ok, ollama = pcall(require, "peetwerapat.core.ollama")
+              if not ok then
+                return ""
+              end
+              local model = ollama.get_current_model()
+              if not model then
+                return ""
+              end
+              return "🤖 " .. model
+            end,
+            cond = function()
+              return vim.bo.buftype == "terminal"
+            end,
           },
         },
         lualine_x = {
@@ -88,7 +104,7 @@ return {
           },
         },
         lualine_y = { "filetype" },
-        lualine_z = { "location", "progress" },
+        -- lualine_z = { "location", "progress" },
       },
 
       inactive_sections = {
