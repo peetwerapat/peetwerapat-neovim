@@ -25,12 +25,12 @@ git clone https://github.com/peetwerapat/neovim ~/.config/nvim
 
 ### 2. Setup ollama ENV
 ```bash
-mkdir -p ~/.config/environment.d
+cat <<'EOF' >> ~/.zshrc
 
-cat <<EOF > ~/.config/environment.d/ollama.conf
-OLLAMA_HOST=your-ollama-host
-OLLAMA_MODEL_ASK=your-ollama-model-ask
-OLLAMA_MODEL_CODE=your-ollama-model-code
+# === Ollama Remote ===
+export OLLAMA_HOST="your-ollama-host"
+export OLLAMA_MODEL_ASK="your-ollama-model-ask"
+export OLLAMA_MODEL_CODE="your-ollama-model-code"
 EOF
 ```
 
