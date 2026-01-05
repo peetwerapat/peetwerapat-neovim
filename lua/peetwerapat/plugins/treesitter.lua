@@ -31,6 +31,6 @@ return {
       indent = { enable = true },
     })
 
-    require("nvim-ts-autotag").setup(autotag_opt)
+    require("nvim-ts-autotag").setup({})
   end,
 }
