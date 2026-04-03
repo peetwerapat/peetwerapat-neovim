@@ -7,9 +7,10 @@ local M = {}
 local OLLAMA_HOST = vim.env.OLLAMA_HOST or "http://localhost:11434"
 
 local MODELS = {
-  ask    = vim.env.OLLAMA_MODEL_ASK or "phi3:mini",
-  code   = vim.env.OLLAMA_MODEL_CODE or "qwen2.5-coder:3b",
-  claude = "claude", -- CLI command
+  ask           = vim.env.OLLAMA_MODEL_ASK or "qwen2.5-coder:7b",
+  code          = vim.env.OLLAMA_MODEL_CODE or "qwen2.5-coder:14b",
+  claude        = "claude",
+  claude_ollama = "qwen3-coder-next:cloud",
 }
 
 -- ==============================
@@ -18,7 +19,7 @@ local MODELS = {
 
 local current_chan = nil
 local current_model = nil
-local current_provider = nil
+-- local current_provider = nil
 
 local chat_win = nil
 local chat_buf = nil
@@ -121,6 +122,31 @@ providers.claude = function()
   )
 end
 
+providers.claude_ollama = function(model)
+  return vim.fn.termopen(
+    {
+      "bash",
+      "-lc",
+      string.format(
+        "export OLLAMA_HOST=%s && ollama launch claude --model %s",
+        OLLAMA_HOST,
+        model
+      ),
+    },
+    {
+      buffer = chat_buf,
+      on_exit = function()
+        current_chan = nil
+        current_model = nil
+        current_provider = nil
+        vim.schedule(function()
+          vim.notify("Claude (Ollama) session exited", vim.log.levels.INFO)
+        end)
+      end,
+    }
+  )
+end
+
 -- ==============================
 -- CORE LAUNCH
 -- ==============================
@@ -141,6 +167,8 @@ local function launch(provider, model)
     current_chan = providers.ollama(model)
   elseif provider == "claude" then
     current_chan = providers.claude()
+  elseif provider == "claude_ollama" then
+    current_chan = providers.claude_ollama(model)
   end
 
   vim.cmd("startinsert")
@@ -223,6 +251,10 @@ function M.chat3()
   launch("claude", MODELS.claude)
 end
 
+function M.chat4()
+  launch("claude_ollama", MODELS.claude_ollama)
+end
+
 function M.stop()
   if chan_valid(current_chan) then
     stop_current()
@@ -251,6 +283,7 @@ vim.api.nvim_create_user_command(
 vim.api.nvim_create_user_command("OllamaChat1", function() M.chat1() end, {})
 vim.api.nvim_create_user_command("OllamaChat2", function() M.chat2() end, {})
 vim.api.nvim_create_user_command("OllamaChat3", function() M.chat3() end, {})
+vim.api.nvim_create_user_command("OllamaChat4", function() M.chat4() end, {})
 vim.api.nvim_create_user_command("OllamaStop", function() M.stop() end, {})
 
 -- ==============================
@@ -259,15 +292,19 @@ vim.api.nvim_create_user_command("OllamaStop", function() M.stop() end, {})
 
 vim.keymap.set("n", "<leader>ac1", function()
   M.chat1()
-end, { desc = "AI Chat (phi3)" })
+end, { desc = "AI Chat (qwen2.5-coder:7b)" })
 
 vim.keymap.set("n", "<leader>ac2", function()
   M.chat2()
-end, { desc = "AI Chat (qwen coder)" })
+end, { desc = "AI Chat (qwen2.5-coder:14b)" })
 
 vim.keymap.set("n", "<leader>ac3", function()
   M.chat3()
 end, { desc = "Claude CLI Chat" })
+
+vim.keymap.set("n", "<leader>ac4", function()
+  M.chat4()
+end, { desc = "Claude via Ollama (qwen3-coder-next:cloud)" })
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true })
 
