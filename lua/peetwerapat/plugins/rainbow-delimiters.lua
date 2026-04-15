@@ -1,14 +1,23 @@
 return {
   "HiPhish/rainbow-delimiters.nvim",
   event = "BufReadPost",
-
   config = function()
-    local rainbow_delimiters = require("rainbow-delimiters")
-
     vim.g.rainbow_delimiters = {
       strategy = {
-        [""] = rainbow_delimiters.strategy["global"],
-        vim = rainbow_delimiters.strategy["local"],
+        [""] = function(bufnr)
+          local ft = vim.bo[bufnr].filetype
+          local bt = vim.bo[bufnr].buftype
+
+          if ft == "toggleterm" or ft == "NvimTree" then
+            return nil
+          end
+
+          if bt == "terminal" or bt == "nofile" or bt == "prompt" or bt == "help" then
+            return nil
+          end
+
+          return "rainbow-delimiters.strategy.global"
+        end,
       },
       query = {
         [""] = "rainbow-delimiters",
