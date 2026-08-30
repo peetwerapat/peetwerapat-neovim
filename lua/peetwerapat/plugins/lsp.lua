@@ -166,23 +166,118 @@ return {
     end
 
     -- =========================
-    -- Java (jdtls)
+    -- Java (jdtls) + Spring Boot
+    -- IntelliJ IDEA formatter profile lives at <config>/Default.xml
     -- =========================
+    local java_format_profile = vim.fn.stdpath("config") .. "/Default.xml"
+
+    -- Pick the highest-version lombok jar from the local Maven repo so jdtls
+    -- can see generated getters/setters/builders. Returns nil if none found.
+    local function find_lombok_jar()
+      local dir = vim.fn.expand("~/.m2/repository/org/projectlombok/lombok")
+      if vim.fn.isdirectory(dir) == 0 then return nil end
+      local jars = vim.fn.glob(dir .. "/*/lombok-*.jar", true, true)
+      local candidates = {}
+      for _, jar in ipairs(jars) do
+        if not jar:match("%-sources%.jar$") and not jar:match("%-javadoc%.jar$") then
+          table.insert(candidates, jar)
+        end
+      end
+      if #candidates == 0 then return nil end
+      table.sort(candidates)
+      return candidates[#candidates]
+    end
+
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "java",
-      callback = function()
-        local root = vim.fs.root(0, { ".git", "pom.xml", "build.gradle" })
+      callback = function(args)
+        local root = vim.fs.root(0, {
+          ".git", "pom.xml", "build.gradle", "build.gradle.kts", "mvnw", "gradlew",
+        })
         if not root then return end
+
+        -- IntelliJ defaults: 4-space indent, no tabs
+        vim.bo[args.buf].tabstop = 4
+        vim.bo[args.buf].shiftwidth = 4
+        vim.bo[args.buf].softtabstop = 4
+        vim.bo[args.buf].expandtab = true
 
         local project = vim.fn.fnamemodify(root, ":t")
         local workspace_dir = vim.fn.stdpath("data") .. "/java-workspace/" .. project
         vim.fn.mkdir(workspace_dir, "p")
 
+        local cmd = { "jdtls", "-data", workspace_dir }
+        local lombok_jar = find_lombok_jar()
+        if lombok_jar then
+          table.insert(cmd, "--jvm-arg=-javaagent:" .. lombok_jar)
+        end
+
         jdtls.start_or_attach({
-          cmd = { "jdtls", "-data", workspace_dir },
+          cmd = cmd,
           root_dir = root,
           capabilities = capabilities,
-          on_attach = on_attach,
+          on_attach = function(client, bufnr)
+            on_attach(client, bufnr)
+
+            -- Format on save using jdtls (uses Default.xml profile below)
+            local fmt_grp = vim.api.nvim_create_augroup(
+              "jdtls_format_on_save_" .. bufnr, { clear = true }
+            )
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              group = fmt_grp,
+              buffer = bufnr,
+              callback = function()
+                vim.lsp.buf.format({ async = false, id = client.id, timeout_ms = 3000 })
+              end,
+            })
+          end,
+          settings = {
+            java = {
+              format = {
+                enabled = true,
+                settings = {
+                  url = java_format_profile,
+                  profile = "Default",
+                },
+              },
+              signatureHelp = { enabled = true },
+              contentProvider = { preferred = "fernflower" },
+              completion = {
+                favoriteStaticMembers = {
+                  "org.junit.jupiter.api.Assertions.*",
+                  "org.junit.jupiter.api.Assumptions.*",
+                  "org.mockito.Mockito.*",
+                  "org.mockito.ArgumentMatchers.*",
+                  "org.hamcrest.MatcherAssert.*",
+                  "org.hamcrest.Matchers.*",
+                  "org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*",
+                  "org.springframework.test.web.servlet.result.MockMvcResultMatchers.*",
+                  "org.springframework.test.web.servlet.result.MockMvcResultHandlers.*",
+                },
+                -- IntelliJ default import grouping
+                importOrder = { "java", "javax", "jakarta", "org", "com", "" },
+              },
+              references = { includeAccessors = true },
+              sources = {
+                organizeImports = {
+                  starThreshold = 99,
+                  staticStarThreshold = 99,
+                },
+              },
+              configuration = {
+                updateBuildConfiguration = "interactive",
+              },
+              maven = { downloadSources = true },
+              eclipse = { downloadSources = true },
+            },
+          },
+          init_options = {
+            extendedClientCapabilities = vim.tbl_deep_extend(
+              "force",
+              jdtls.extendedClientCapabilities or {},
+              { resolveAdditionalTextEditsSupport = true }
+            ),
+          },
         })
       end,
     })

@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Vim / Neovim swap, backup, undo
+*.swp
+*.swo
+*.swn
+*~
+.netrwhist
+tags
+undodir/
+backup/
+swap/
+shada/
+sessions/
+*.shada
+*.vim.session
+
+# Spell files ที่ nvim ดาวน์โหลดเอง
+spell/*.spl
+spell/*.sug
+
+# Local overrides (ไม่ push ค่าเฉพาะเครื่อง)
+lua/peetwerapat/local.lua
+.nvim.lua
+.nvimrc
+.exrc
+
+# Logs / temp
+*.log
+*.tmp
+

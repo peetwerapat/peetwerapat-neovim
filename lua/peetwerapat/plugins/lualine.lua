@@ -67,11 +67,11 @@ return {
           -- },
           {
             function()
-              local ok, ollama = pcall(require, "peetwerapat.core.ollama")
+              local ok, ai = pcall(require, "peetwerapat.core.ai")
               if not ok then
                 return ""
               end
-              local model = ollama.get_current_model()
+              local model = ai.get_current_model()
               if not model then
                 return ""
               end
