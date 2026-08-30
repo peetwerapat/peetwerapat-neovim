@@ -3,4 +3,4 @@ require("peetwerapat.core.options")
 
 require("peetwerapat.core.lazy")
 
-require("peetwerapat.core.ollama")
+require("peetwerapat.core.ai")

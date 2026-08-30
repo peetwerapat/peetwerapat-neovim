@@ -11,6 +11,7 @@ local MODELS = {
   code          = vim.env.OLLAMA_MODEL_CODE or "qwen2.5-coder:14b",
   claude        = "claude",
   claude_ollama = "qwen3-coder-next:cloud",
+  codex         = "codex",
 }
 
 local MAX_FILES = tonumber(vim.env.AI_MAX_FILES or "5")
@@ -347,6 +348,22 @@ providers.claude_ollama = function(model)
   )
 end
 
+providers.codex = function()
+  return vim.fn.termopen(
+    { "bash", "-lc", "codex" },
+    {
+      buffer = chat_buf,
+      on_exit = function()
+        current_chan = nil
+        current_model = nil
+        current_provider = nil
+        is_waiting = false
+        notify("Codex session exited", vim.log.levels.INFO)
+      end,
+    }
+  )
+end
+
 -- ==============================
 -- CORE LAUNCH
 -- ==============================
@@ -369,6 +386,8 @@ local function launch(provider, model)
     current_chan = providers.claude()
   elseif provider == "claude_ollama" then
     current_chan = providers.claude_ollama(model)
+  elseif provider == "codex" then
+    current_chan = providers.codex()
   end
 
   vim.cmd("startinsert")
@@ -461,7 +480,7 @@ end
 function M.ask(opts)
   local prompt, err = build_prompt(opts)
   if not prompt then
-    return notify(err or "OllamaAsk: missing prompt", vim.log.levels.ERROR)
+    return notify(err or "AIAsk: missing prompt", vim.log.levels.ERROR)
   end
 
   if not chan_valid(current_chan) or current_model ~= MODELS.ask or current_provider ~= "ollama" then
@@ -476,7 +495,7 @@ end
 function M.code(opts)
   local prompt, err = build_prompt(opts)
   if not prompt then
-    return notify(err or "OllamaCode: missing prompt", vim.log.levels.ERROR)
+    return notify(err or "AICode: missing prompt", vim.log.levels.ERROR)
   end
 
   if not chan_valid(current_chan) or current_model ~= MODELS.code or current_provider ~= "ollama" then
@@ -504,6 +523,10 @@ function M.chat4()
   launch("claude_ollama", MODELS.claude_ollama)
 end
 
+function M.chat5()
+  launch("codex", MODELS.codex)
+end
+
 function M.stop()
   if chan_valid(current_chan) then
     stop_current()
@@ -518,22 +541,23 @@ end
 -- ==============================
 
 vim.api.nvim_create_user_command(
-  "OllamaAsk",
+  "AIAsk",
   function(opts) M.ask(opts) end,
   { nargs = "*", range = true }
 )
 
 vim.api.nvim_create_user_command(
-  "OllamaCode",
+  "AICode",
   function(opts) M.code(opts) end,
   { nargs = "*", range = true }
 )
 
-vim.api.nvim_create_user_command("OllamaChat1", function() M.chat1() end, {})
-vim.api.nvim_create_user_command("OllamaChat2", function() M.chat2() end, {})
-vim.api.nvim_create_user_command("OllamaChat3", function() M.chat3() end, {})
-vim.api.nvim_create_user_command("OllamaChat4", function() M.chat4() end, {})
-vim.api.nvim_create_user_command("OllamaStop", function() M.stop() end, {})
+vim.api.nvim_create_user_command("AIChat1", function() M.chat1() end, {})
+vim.api.nvim_create_user_command("AIChat2", function() M.chat2() end, {})
+vim.api.nvim_create_user_command("AIChat3", function() M.chat3() end, {})
+vim.api.nvim_create_user_command("AIChat4", function() M.chat4() end, {})
+vim.api.nvim_create_user_command("AIChat5", function() M.chat5() end, {})
+vim.api.nvim_create_user_command("AIStop", function() M.stop() end, {})
 
 -- ==============================
 -- KEYMAPS
@@ -554,6 +578,10 @@ end, { desc = "Claude CLI Chat" })
 vim.keymap.set("n", "<leader>ac4", function()
   M.chat4()
 end, { desc = "Claude via Ollama (qwen3-coder-next:cloud)" })
+
+vim.keymap.set("n", "<leader>ac5", function()
+  M.chat5()
+end, { desc = "Codex CLI Chat" })
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true })
 
