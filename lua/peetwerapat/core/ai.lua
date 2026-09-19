@@ -382,6 +382,18 @@ providers.gemini = function()
 end
 
 -- ==============================
+-- CHAT BUFFER KEYMAPS
+-- ==============================
+
+local function setup_chat_keymaps(buf)
+  vim.keymap.set("t", "<Esc>", "<Esc>", {
+    buffer = buf,
+    silent = true,
+    desc = "Send Esc to AI CLI",
+  })
+end
+
+-- ==============================
 -- CORE LAUNCH
 -- ==============================
 
@@ -393,6 +405,7 @@ local function launch(provider, model)
   chat_buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_name(chat_buf, "AI: " .. (model or provider))
   vim.api.nvim_win_set_buf(win, chat_buf)
+  setup_chat_keymaps(chat_buf)
 
   current_provider = provider
   current_model = model
