@@ -11,7 +11,7 @@ local MODELS = {
   code          = vim.env.OLLAMA_MODEL_CODE or "qwen2.5-coder:14b",
   claude        = "claude",
   codex         = "codex",
-  gemini        = "gemini",
+  antigravity   = "agy",
   claude_ollama = "qwen3-coder-next:cloud",
 }
 
@@ -365,9 +365,9 @@ providers.codex = function()
   )
 end
 
-providers.gemini = function()
+providers.antigravity = function()
   return vim.fn.termopen(
-    { "bash", "-lc", "gemini" },
+    { "bash", "-lc", "agy" },
     {
       buffer = chat_buf,
       on_exit = function()
@@ -375,7 +375,7 @@ providers.gemini = function()
         current_model = nil
         current_provider = nil
         is_waiting = false
-        notify("Gemini session exited", vim.log.levels.INFO)
+        notify("Antigravity session exited", vim.log.levels.INFO)
       end,
     }
   )
@@ -421,8 +421,8 @@ local function launch(provider, model)
     current_chan = providers.claude_ollama(model)
   elseif provider == "codex" then
     current_chan = providers.codex()
-  elseif provider == "gemini" then
-    current_chan = providers.gemini()
+  elseif provider == "antigravity" then
+    current_chan = providers.antigravity()
   end
 
   vim.cmd("startinsert")
@@ -559,7 +559,7 @@ function M.chat4()
 end
 
 function M.chat5()
-  launch("gemini", MODELS.gemini)
+  launch("antigravity", MODELS.antigravity)
 end
 
 function M.chat6()
@@ -621,7 +621,7 @@ end, { desc = "Codex CLI Chat" })
 
 vim.keymap.set("n", "<leader>ac5", function()
   M.chat5()
-end, { desc = "Gemini CLI Chat" })
+end, { desc = "Antigravity CLI Chat" })
 
 vim.keymap.set("n", "<leader>ac6", function()
   M.chat6()
