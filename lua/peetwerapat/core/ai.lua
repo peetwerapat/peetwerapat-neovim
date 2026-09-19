@@ -10,8 +10,9 @@ local MODELS = {
   ask           = vim.env.OLLAMA_MODEL_ASK or "qwen2.5-coder:7b",
   code          = vim.env.OLLAMA_MODEL_CODE or "qwen2.5-coder:14b",
   claude        = "claude",
-  claude_ollama = "qwen3-coder-next:cloud",
   codex         = "codex",
+  gemini        = "gemini",
+  claude_ollama = "qwen3-coder-next:cloud",
 }
 
 local MAX_FILES = tonumber(vim.env.AI_MAX_FILES or "5")
@@ -364,6 +365,22 @@ providers.codex = function()
   )
 end
 
+providers.gemini = function()
+  return vim.fn.termopen(
+    { "bash", "-lc", "gemini" },
+    {
+      buffer = chat_buf,
+      on_exit = function()
+        current_chan = nil
+        current_model = nil
+        current_provider = nil
+        is_waiting = false
+        notify("Gemini session exited", vim.log.levels.INFO)
+      end,
+    }
+  )
+end
+
 -- ==============================
 -- CORE LAUNCH
 -- ==============================
@@ -388,6 +405,8 @@ local function launch(provider, model)
     current_chan = providers.claude_ollama(model)
   elseif provider == "codex" then
     current_chan = providers.codex()
+  elseif provider == "gemini" then
+    current_chan = providers.gemini()
   end
 
   vim.cmd("startinsert")
@@ -416,7 +435,7 @@ local function build_prompt(opts)
 
   local parts = {}
 
-  -- ✅ FIX: ใส่ system prompt หลัง declare parts
+  -- NOTE: the system prompt must be inserted after `parts` is declared
   table.insert(parts, [[
 You are a senior software engineer.
 You can read and analyze the provided file contents.
@@ -520,11 +539,15 @@ function M.chat3()
 end
 
 function M.chat4()
-  launch("claude_ollama", MODELS.claude_ollama)
+  launch("codex", MODELS.codex)
 end
 
 function M.chat5()
-  launch("codex", MODELS.codex)
+  launch("gemini", MODELS.gemini)
+end
+
+function M.chat6()
+  launch("claude_ollama", MODELS.claude_ollama)
 end
 
 function M.stop()
@@ -557,6 +580,7 @@ vim.api.nvim_create_user_command("AIChat2", function() M.chat2() end, {})
 vim.api.nvim_create_user_command("AIChat3", function() M.chat3() end, {})
 vim.api.nvim_create_user_command("AIChat4", function() M.chat4() end, {})
 vim.api.nvim_create_user_command("AIChat5", function() M.chat5() end, {})
+vim.api.nvim_create_user_command("AIChat6", function() M.chat6() end, {})
 vim.api.nvim_create_user_command("AIStop", function() M.stop() end, {})
 
 -- ==============================
@@ -577,11 +601,15 @@ end, { desc = "Claude CLI Chat" })
 
 vim.keymap.set("n", "<leader>ac4", function()
   M.chat4()
-end, { desc = "Claude via Ollama (qwen3-coder-next:cloud)" })
+end, { desc = "Codex CLI Chat" })
 
 vim.keymap.set("n", "<leader>ac5", function()
   M.chat5()
-end, { desc = "Codex CLI Chat" })
+end, { desc = "Gemini CLI Chat" })
+
+vim.keymap.set("n", "<leader>ac6", function()
+  M.chat6()
+end, { desc = "Claude via Ollama (qwen3-coder-next:cloud)" })
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { silent = true })
 

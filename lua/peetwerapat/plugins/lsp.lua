@@ -121,7 +121,7 @@ return {
 
     -- =========================
     -- TypeScript / JavaScript
-    -- (plugin ยังใช้ pattern เดิม)
+    -- (the plugin still uses the old pattern)
     -- =========================
     if executable("node") then
       typescript_tools.setup({

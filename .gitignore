@@ -19,11 +19,11 @@ sessions/
 *.shada
 *.vim.session
 
-# Spell files ที่ nvim ดาวน์โหลดเอง
+# Spell files nvim downloads on its own
 spell/*.spl
 spell/*.sug
 
-# Local overrides (ไม่ push ค่าเฉพาะเครื่อง)
+# Local overrides (machine-specific, never pushed)
 lua/peetwerapat/local.lua
 .nvim.lua
 .nvimrc
