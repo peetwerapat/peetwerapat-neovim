@@ -386,11 +386,14 @@ end
 -- ==============================
 
 local function setup_chat_keymaps(buf)
-  vim.keymap.set("t", "<Esc>", "<Esc>", {
-    buffer = buf,
-    silent = true,
-    desc = "Send Esc to AI CLI",
-  })
+  -- Disabled: <Esc> was passed through to the AI CLI, which interrupts the
+  -- running response. Falls back to the global "t" mapping (<Esc> -> normal mode).
+  -- vim.keymap.set("t", "<Esc>", "<Esc>", {
+  --   buffer = buf,
+  --   silent = true,
+  --   desc = "Send Esc to AI CLI",
+  -- })
+  local _ = buf
 end
 
 -- ==============================
