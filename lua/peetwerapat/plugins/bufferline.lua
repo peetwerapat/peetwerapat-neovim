@@ -10,6 +10,17 @@ return {
       options = {
         diagnostics = "nvim_lsp",
         show_buffer_close_icons = false,
+        custom_filter = function(buf)
+          if vim.b[buf].ai_chat then
+            return false
+          end
+          if vim.api.nvim_buf_get_name(buf) == "" and not vim.bo[buf].modified
+              and vim.api.nvim_buf_line_count(buf) == 1
+              and vim.api.nvim_buf_get_lines(buf, 0, 1, false)[1] == "" then
+            return false
+          end
+          return true
+        end,
       },
     })
 

@@ -45,6 +45,7 @@ return {
         theme = cyberdream_bright_blue,
         component_separators = { left = "|", right = "|" },
         section_separators = "",
+        disabled_filetypes = { statusline = { "ai_chat", "ai_quota" } },
       },
 
       sections = {
@@ -55,33 +56,7 @@ return {
           { "branch", icon = "" },
           -- "diff",
         },
-        lualine_c = {
-          -- {
-          --   "filename",
-          --   path = 1,
-          --   symbols = {
-          --     modified = "[+]",
-          --     readonly = "[🔒]",
-          --     unnamed = "[No Name]",
-          --   },
-          -- },
-          {
-            function()
-              local ok, ai = pcall(require, "peetwerapat.core.ai")
-              if not ok then
-                return ""
-              end
-              local model = ai.get_current_model()
-              if not model then
-                return ""
-              end
-              return "🤖 " .. model
-            end,
-            cond = function()
-              return vim.bo.buftype == "terminal"
-            end,
-          },
-        },
+        lualine_c = {},
         lualine_x = {
           {
             "diagnostics",
@@ -110,7 +85,15 @@ return {
       inactive_sections = {
         lualine_a = {},
         lualine_b = {},
-        lualine_c = { { "filename", path = 1 } },
+        lualine_c = {
+          {
+            "filename",
+            path = 1,
+            cond = function()
+              return vim.bo.buftype ~= "terminal"
+            end,
+          },
+        },
         lualine_x = { "location" },
         lualine_y = {},
         lualine_z = {},
