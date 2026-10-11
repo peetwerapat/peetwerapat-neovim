@@ -49,7 +49,7 @@ return {
         preserve_window_proportions = false,
         number = false,
         relativenumber = false,
-        signcolumn = "yes",
+        signcolumn = "no",
       },
       renderer = {
         indent_markers = {

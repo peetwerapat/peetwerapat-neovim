@@ -140,7 +140,7 @@ vim.api.nvim_set_decoration_provider(header_ns, {
     local width = vim.api.nvim_win_get_width(win)
     local left, space, right = footer_heading(width)
     local heading = {
-      { left, "AIQuotaTitle" },
+      { left,  "AIQuotaTitle" },
       { space, "AIQuotaBackground" },
       { right, "AIQuotaLive" },
     }
@@ -202,7 +202,8 @@ local function ensure_quota_footer()
   vim.wo[quota_win].scrolloff = 0
   vim.wo[quota_win].cursorline = false
   vim.wo[quota_win].statusline = "%#AIQuotaBackground# "
-  vim.wo[quota_win].winhighlight = "Normal:AIQuotaBackground,EndOfBuffer:AIQuotaBackground,StatusLine:AIQuotaBackground,StatusLineNC:AIQuotaBackground"
+  vim.wo[quota_win].winhighlight =
+  "Normal:AIQuotaBackground,EndOfBuffer:AIQuotaBackground,StatusLine:AIQuotaBackground,StatusLineNC:AIQuotaBackground"
   vim.api.nvim_set_current_win(chat_win)
 end
 
@@ -218,6 +219,12 @@ local function ensure_chat_vsplit()
   vim.cmd("vertical resize 60")
 
   chat_win = vim.api.nvim_get_current_win()
+  vim.wo[chat_win].number = false
+  vim.wo[chat_win].relativenumber = false
+  vim.wo[chat_win].signcolumn = "no"
+  vim.wo[chat_win].foldcolumn = "0"
+  vim.wo[chat_win].cursorline = false
+  vim.wo[chat_win].scrolloff = 0
   vim.wo[chat_win].winhighlight = "WinBar:AIQuotaBackground,WinBarNC:AIQuotaBackground"
   vim.wo[chat_win].statusline = "%#AIQuotaBackground# "
 
